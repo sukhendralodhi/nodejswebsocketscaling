@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>Websocket Server Demo</h1>
+
+    <div>
+        <input type="text" id="messageInput" placeholder="Type a message..." />
+        <button id="sendButton">Send</button>
+        <ul id="messageList">
+
+        </ul>
+    </div>
+
+    <script>
+        // Dome element references
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const messageList = document.getElementById('messageList');
+
+        const { port } = window.location;
+        const connection = new WebSocket(`ws://localhost:${port}`);
+        connection.onopen = () => {
+            connection.onmessage = (message) => {
+                console.log('Message Revieved', message)
+                const rawData = message.data;
+                const parsedData = JSON.parse(rawData);
+                const text = parsedData.message;
+
+                const li = document.createElement('li');
+                li.innerText = text;
+                messageList.appendChild(li);
+            }
+            sendButton.addEventListener('click', (event) => {
+                const value = messageInput.value
+                connection.send(JSON.stringify(
+                    {
+                        message: value
+                    }
+                ));
+            });
+        };
+    </script>
+</body>
+
+</html>
